@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus AI: MSME Financial Health Architecture</title>
+    <title>CredScope AI: MSME Financial Health Architecture</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Mermaid JS for diagrams -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <!-- SVG Pan Zoom for interactivity -->
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
     <script>
         mermaid.initialize({ 
             startOnLoad: true,
@@ -15,10 +17,32 @@
             securityLevel: 'loose',
             fontFamily: 'Inter, sans-serif'
         });
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                document.querySelectorAll('.mermaid svg').forEach(svg => {
+                    svg.style.width = '100%';
+                    svg.style.height = '700px'; // Fixed viewport height
+                    svg.style.maxWidth = 'none';
+                    
+                    svgPanZoom(svg, {
+                        zoomEnabled: true,
+                        controlIconsEnabled: true,
+                        fit: false,   // Important: Do not force fit, prevents squashing
+                        center: true,
+                        minZoom: 0.5,
+                        maxZoom: 5
+                    });
+                });
+            }, 1000);
+        });
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
         body { font-family: 'Inter', sans-serif; }
+        .mermaid { width: 100%; overflow: hidden; border-radius: 0.5rem; }
+        .mermaid svg { max-width: none !important; cursor: grab; }
+        .mermaid svg:active { cursor: grabbing; }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-200 antialiased selection:bg-blue-500/30">
@@ -28,11 +52,16 @@
         <!-- Header -->
         <header class="mb-16 border-b border-slate-700 pb-10">
             <h1 class="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 mb-4">
-                Nexus AI Architecture Design
+                CredScope AI: Proposed Architecture Solution
             </h1>
             <p class="text-slate-400 text-lg max-w-3xl leading-relaxed">
-                A comprehensive overview of the AI-enabled Financial Health Report system. This document outlines the end-to-end implementation built for Cars24, followed by a strategic alternative design demonstrating integration with India's Digital Public Infrastructure.
+                A comprehensive overview of the AI-enabled Financial Health Report system. This document outlines the proposed end-to-end implementation built for the MSME Financial Health Card Assignment, followed by a strategic alternative design demonstrating integration with India's Digital Public Infrastructure.
             </p>
+            <div class="mt-6 bg-blue-900/30 border border-blue-500/30 p-5 rounded-xl max-w-4xl">
+                <p class="text-blue-200 text-base leading-relaxed">
+                    <strong>Important Note on Scope:</strong> In this implementation, active Machine Learning (XGBoost) models have been custom-built specifically for three core targets: <strong>1) Overall Financial Health Score</strong>, <strong>2) Credit Eligibility</strong>, and <strong>3) Recommended Credit Limit</strong>. The remaining sub-scores (Business Stability, Cash Flow, Revenue Consistency, Payment Behaviour, Business Growth, and Compliance) are currently represented as static UI placeholders to fulfill UI requirements, and will be integrated with dedicated ML models in future iterations.
+                </p>
+            </div>
         </header>
 
         <!-- SECTION 1: Current Implementation -->
@@ -53,9 +82,17 @@
                     </ul>
 
                     <h3 class="text-xl font-semibold text-blue-400 pt-6">Data Ingestion & ML Workflow</h3>
-                    <p class="text-slate-300 leading-relaxed">
+                    <p class="text-slate-300 leading-relaxed mb-6">
                         Raw alternative data (GST, UPI, Banking) is passed to the FastAPI endpoint. The backend strictly shares the <strong>feature engineering module</strong> (<code>utils.py</code>) with the offline ML pipeline to prevent data drift. The data is transformed via a Scikit-Learn <code>ColumnTransformer</code> and fed into three parallel XGBoost models to predict the <strong>Health Score</strong>, <strong>Credit Eligibility</strong>, and <strong>Credit Limit</strong>.
                     </p>
+
+                    <h3 class="text-xl font-semibold text-emerald-400">What is Currently Integrated in Code</h3>
+                    <div class="bg-slate-800/50 border border-slate-700 p-4 rounded-xl">
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            <strong>Implemented:</strong> The Next.js frontend, FastAPI backend, feature engineering pipeline, and the three XGBoost models alongside SHAP explainers are fully operational and integrated in the current codebase.<br><br>
+                            <strong>Not Implemented (Simulated):</strong> The LLM/GenAI layer for textual risk insights and the DPI/Account Aggregator live APIs are currently simulated/mocked for demonstration purposes.
+                        </p>
+                    </div>
                 </div>
                 
                 <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 shadow-xl overflow-x-auto">
@@ -73,18 +110,23 @@
                                 PRE --> XGB3[XGBoost: Credit Limit]
                                 
                                 XGB1 -.-> |Model Weights| SHAP[SHAP TreeExplainer]
+                                
+                                SHAP --> |Raw SHAP Values| LLM[LLM / GenAI Layer]
+                                PRE --> |Engineered Data| LLM
                             end
                             
                             XGB1 --> RES[Response Aggregator]
                             XGB2 --> RES
                             XGB3 --> RES
-                            SHAP --> RES
+                            LLM -->|Generates Textual Risk Indicators & Positive Insights| RES
                             
                             RES -->|HealthCardResponse| Client
                             
                             classDef default fill:#1e293b,stroke:#334155,stroke-width:2px,color:#f8fafc;
                             classDef highlight fill:#0f172a,stroke:#3b82f6,stroke-width:2px,color:#93c5fd;
+                            classDef ai fill:#4c1d95,stroke:#8b5cf6,stroke-width:2px,color:#e9d5ff;
                             class API,FE,PRE highlight;
+                            class LLM ai;
                     </div>
                 </div>
             </div>
@@ -98,7 +140,7 @@
             </h2>
             
             <p class="text-slate-300 leading-relaxed mb-10 max-w-4xl">
-                To achieve true financial inclusion and straight-through processing (STP) for MSMEs, the system must shift from manual data entry to a fully integrated digital ecosystem. The architecture below demonstrates how Nexus AI acts as a <strong>Credit Underwriting Engine</strong> sitting between India's consent-based Digital Public Infrastructure (DPI) and modern lending networks (OCEN/ULI).
+                To achieve true financial inclusion and straight-through processing (STP) for MSMEs, the system must shift from manual data entry to a fully integrated digital ecosystem. The architecture below demonstrates how CredScope AI acts as a <strong>Credit Underwriting Engine</strong> sitting between India's consent-based Digital Public Infrastructure (DPI) and modern lending networks (OCEN/ULI).
             </p>
 
             <div class="bg-slate-800/50 p-8 rounded-2xl border border-slate-700 shadow-xl mb-12 overflow-x-auto flex justify-center">
@@ -109,7 +151,8 @@
                         actor MSME as MSME Borrower
                         participant AA as Account Aggregator (AA)
                         participant GSTN as GST Network
-                        participant Engine as Nexus AI (Our System)
+                        participant Engine as CredScope AI (Our System)
+                        participant LLM as GenAI / SLM
                         participant OCEN as OCEN / ULI (Lending Network)
                         participant Bank as Lending Bank
 
@@ -124,10 +167,13 @@
                         GSTN-->>Engine: Returns Verified Sales Data
                         
                         rect rgb(30, 41, 59)
-                        Note over Engine: Data Ingestion Pipeline & AI/ML Workflow<br/>(Feature Engineering + XGBoost + SHAP)
+                        Note over Engine,LLM: Data Ingestion Pipeline & AI/ML Workflow
+                        Engine->>Engine: Feature Engineering + XGBoost + SHAP
+                        Engine->>LLM: Send SHAP impacts & financial ratios
+                        LLM-->>Engine: Returns Natural Language Risk Indicators & Insights
                         end
                         
-                        Engine->>OCEN: Returns Financial Health Score & Limits
+                        Engine->>OCEN: Returns Financial Health Score, Limits, & LLM Insights
                         OCEN->>Bank: Routes Lead to Eligible Lenders
                         Bank-->>MSME: Instant Loan Disbursement
                 </div>

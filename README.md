@@ -1,6 +1,6 @@
 # MSME Financial Health Card Assignment
 
-This repository contains the complete solution for the Cars24 MSME Financial Health Card Assignment.
+This repository contains the complete solution for the MSME Financial Health Card Assignment.
 
 ## Architecture
 

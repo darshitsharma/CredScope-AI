@@ -100,6 +100,41 @@ def generate_score(data: MSMEData) -> HealthCardResponse:
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/api/ingest")
+def ingest_data(data: MSMEData) -> Dict[str, str]:
+    """
+    Simulates data ingestion from external sources (GST, UPI, Banking).
+    In a production system, this would write the MSME data to a database.
+    
+    Args:
+        data (MSMEData): The raw financial and demographic data of the MSME.
+        
+    Returns:
+        Dict[str, str]: A success message indicating successful data ingestion.
+    """
+    return {"status": "success", "message": "Data ingested successfully"}
+
+@app.get("/api/health-card/{msme_id}", response_model=HealthCardResponse)
+def get_health_card(msme_id: str) -> HealthCardResponse:
+    """
+    Retrieves a previously generated financial health card for a given MSME.
+    Since there is no database attached to this prototype, this endpoint returns 
+    a simulated successful response for demonstration purposes to satisfy API contract requirements.
+    
+    Args:
+        msme_id (str): The unique identifier of the MSME.
+        
+    Returns:
+        HealthCardResponse: An object containing the predicted score, eligibility, credit limit, and SHAP impacts.
+    """
+    return HealthCardResponse(
+        Financial_Health_Score=75.0,
+        Credit_Eligible="Yes",
+        Recommended_Credit_Limit_INR=500000.0,
+        shap_positive=[],
+        shap_negative=[]
+    )
+
 @app.get("/api/metrics", response_model=MetricsResponse)
 def get_metrics() -> MetricsResponse:
     """
