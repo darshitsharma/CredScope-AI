@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus AI: MSME Financial Health Architecture</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Mermaid JS for diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'dark',
+            securityLevel: 'loose',
+            fontFamily: 'Inter, sans-serif'
+        });
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-200 antialiased selection:bg-blue-500/30">
+
+    <div class="max-w-6xl mx-auto px-6 py-16">
+        
+        <!-- Header -->
+        <header class="mb-16 border-b border-slate-700 pb-10">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 mb-4">
+                Nexus AI Architecture Design
+            </h1>
+            <p class="text-slate-400 text-lg max-w-3xl leading-relaxed">
+                A comprehensive overview of the AI-enabled Financial Health Report system. This document outlines the end-to-end implementation built for Cars24, followed by a strategic alternative design demonstrating integration with India's Digital Public Infrastructure.
+            </p>
+        </header>
+
+        <!-- SECTION 1: Current Implementation -->
+        <section class="mb-24">
+            <h2 class="text-3xl font-bold text-white mb-8 flex items-center">
+                <span class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm mr-4">1</span>
+                End-to-End System Architecture (Current Implementation)
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
+                <div class="space-y-6">
+                    <h3 class="text-xl font-semibold text-blue-400">Technology Stack</h3>
+                    <ul class="space-y-3 text-slate-300">
+                        <li class="flex items-start"><strong class="text-white w-32">Frontend:</strong> Next.js (React), Tailwind CSS, Glassmorphism UI</li>
+                        <li class="flex items-start"><strong class="text-white w-32">Backend API:</strong> FastAPI (Python), Uvicorn, Pydantic (Schema Validation)</li>
+                        <li class="flex items-start"><strong class="text-white w-32">ML Pipeline:</strong> XGBoost (Regression & Classification), Scikit-Learn</li>
+                        <li class="flex items-start"><strong class="text-white w-32">Explainability:</strong> SHAP (TreeExplainer) for neural interpretability</li>
+                    </ul>
+
+                    <h3 class="text-xl font-semibold text-blue-400 pt-6">Data Ingestion & ML Workflow</h3>
+                    <p class="text-slate-300 leading-relaxed">
+                        Raw alternative data (GST, UPI, Banking) is passed to the FastAPI endpoint. The backend strictly shares the <strong>feature engineering module</strong> (<code>utils.py</code>) with the offline ML pipeline to prevent data drift. The data is transformed via a Scikit-Learn <code>ColumnTransformer</code> and fed into three parallel XGBoost models to predict the <strong>Health Score</strong>, <strong>Credit Eligibility</strong>, and <strong>Credit Limit</strong>.
+                    </p>
+                </div>
+                
+                <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 shadow-xl overflow-x-auto">
+                    <!-- Mermaid Diagram 1 -->
+                    <div class="mermaid">
+                        graph TD
+                            Client([Next.js Frontend Dashboard]) -->|JSON Payload| API[FastAPI Endpoint /api/score]
+                            
+                            subgraph "Backend Services (Python)"
+                                API --> FE[Feature Engineering Module]
+                                FE --> |Engineered Ratios| PRE[Scikit-Learn Preprocessor]
+                                
+                                PRE --> XGB1[XGBoost: Health Score]
+                                PRE --> XGB2[XGBoost: Eligibility]
+                                PRE --> XGB3[XGBoost: Credit Limit]
+                                
+                                XGB1 -.-> |Model Weights| SHAP[SHAP TreeExplainer]
+                            end
+                            
+                            XGB1 --> RES[Response Aggregator]
+                            XGB2 --> RES
+                            XGB3 --> RES
+                            SHAP --> RES
+                            
+                            RES -->|HealthCardResponse| Client
+                            
+                            classDef default fill:#1e293b,stroke:#334155,stroke-width:2px,color:#f8fafc;
+                            classDef highlight fill:#0f172a,stroke:#3b82f6,stroke-width:2px,color:#93c5fd;
+                            class API,FE,PRE highlight;
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: Alternative Design (Integration Strategy) -->
+        <section>
+            <h2 class="text-3xl font-bold text-white mb-8 flex items-center">
+                <span class="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-sm mr-4">2</span>
+                Integration Strategy (India DPI Alternative Design)
+            </h2>
+            
+            <p class="text-slate-300 leading-relaxed mb-10 max-w-4xl">
+                To achieve true financial inclusion and straight-through processing (STP) for MSMEs, the system must shift from manual data entry to a fully integrated digital ecosystem. The architecture below demonstrates how Nexus AI acts as a <strong>Credit Underwriting Engine</strong> sitting between India's consent-based Digital Public Infrastructure (DPI) and modern lending networks (OCEN/ULI).
+            </p>
+
+            <div class="bg-slate-800/50 p-8 rounded-2xl border border-slate-700 shadow-xl mb-12 overflow-x-auto flex justify-center">
+                <!-- Mermaid Diagram 2 -->
+                <div class="mermaid">
+                    sequenceDiagram
+                        autonumber
+                        actor MSME as MSME Borrower
+                        participant AA as Account Aggregator (AA)
+                        participant GSTN as GST Network
+                        participant Engine as Nexus AI (Our System)
+                        participant OCEN as OCEN / ULI (Lending Network)
+                        participant Bank as Lending Bank
+
+                        MSME->>OCEN: Applies for MSME Loan via App
+                        OCEN->>Engine: Requests Credit Assessment
+                        Engine->>AA: Triggers Consent Request (Bank Statements, UPI)
+                        AA-->>MSME: Prompts for OTP / PIN Consent
+                        MSME->>AA: Approves Data Sharing
+                        AA->>Engine: Pushes Encrypted FIP Data (Banking APIs)
+                        
+                        Engine->>GSTN: API Call for GST Returns & E-Way Bills
+                        GSTN-->>Engine: Returns Verified Sales Data
+                        
+                        rect rgb(30, 41, 59)
+                        Note over Engine: Data Ingestion Pipeline & AI/ML Workflow<br/>(Feature Engineering + XGBoost + SHAP)
+                        end
+                        
+                        Engine->>OCEN: Returns Financial Health Score & Limits
+                        OCEN->>Bank: Routes Lead to Eligible Lenders
+                        Bank-->>MSME: Instant Loan Disbursement
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Point 1 -->
+                <div class="bg-slate-800/30 border border-slate-700/50 p-6 rounded-xl hover:bg-slate-800/50 transition-colors">
+                    <h4 class="text-emerald-400 font-bold mb-3 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        Account Aggregators & Banking
+                    </h4>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        Instead of manual CSV uploads, the system will act as a Financial Information User (FIU). It will parse raw JSON bank statements and UPI transaction hashes provided by AAs to compute features like <em>Cashflow_Stability_Index</em> in real-time.
+                    </p>
+                </div>
+
+                <!-- Point 2 -->
+                <div class="bg-slate-800/30 border border-slate-700/50 p-6 rounded-xl hover:bg-slate-800/50 transition-colors">
+                    <h4 class="text-amber-400 font-bold mb-3 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        GSTN Integration
+                    </h4>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        GSTN APIs will provide cryptographically verified GSTR-1 and GSTR-3B filings. This data feeds directly into our <em>GST_Filing_Timeliness_Pct</em> and <em>Monthly_GST_Sales_INR</em> metrics, ensuring the ML model operates on fraud-proof alternative data.
+                    </p>
+                </div>
+
+                <!-- Point 3 -->
+                <div class="bg-slate-800/30 border border-slate-700/50 p-6 rounded-xl hover:bg-slate-800/50 transition-colors">
+                    <h4 class="text-blue-400 font-bold mb-3 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        ULI & OCEN Networks
+                    </h4>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        Once the Financial Health Score and SHAP insights are generated, they are formatted as a standardized JSON response and pushed to the Open Credit Enablement Network (OCEN) or Unified Lending Interface (ULI). This allows multiple lenders to consume our ML-derived risk metrics instantly.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</body>
+</html>
